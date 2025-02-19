@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio dos Periféricos</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #e3f2fd; }
+        h2 { color: #1565c0; }
+        .container { display: flex; justify-content: space-around; margin-top: 20px; }
+        .box { width: 45%; min-height: 250px; border: 4px dashed #1565c0; padding: 10px; background-color: #fff; border-radius: 10px; }
+        .peripheral { cursor: grab; padding: 10px; margin: 10px; background: #fff; display: inline-block; border-radius: 10px; text-align: center; box-shadow: 3px 3px 10px rgba(0,0,0,0.2); }
+        .peripheral:hover { transform: scale(1.1); }
+        .peripheral img { width: 100px; height: 100px; display: block; margin: 0 auto; }
+        .description { margin-top: 20px; }
+        .description input { padding: 10px; width: 80%; border: 2px solid #1565c0; border-radius: 5px; text-align: center; font-size: 1rem; }
+        #descriptions { margin-top: 20px; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 3px 3px 10px rgba(0,0,0,0.2); }
+        button { margin-top: 20px; padding: 10px 20px; background: #1565c0; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; }
+        button:hover { background: #0d47a1; }
+    </style>
+</head>
+<body>
+    <h2>Arraste os periféricos para a categoria correta!</h2>
+    <div class="container">
+        <div id="peripherals">
+            <div class="peripheral" draggable="true" id="mouse" data-category="entrada">
+                <img src="mouse.png" alt="Mouse">
+                <p>Mouse</p>
+            </div>
+            <div class="peripheral" draggable="true" id="fone" data-category="saida">
+                <img src="fone.png" alt="Fone">
+                <p>Fonde de Ouvido</p>
+            </div>
+            <div class="peripheral" draggable="true" id="teclado" data-category="entrada">
+                <img src="teclado.png" alt="Teclado">
+                <p>Teclado</p>
+            </div>
+            <div class="peripheral" draggable="true" id="monitor" data-category="saida">
+                <img src="monitor.png" alt="Monitor">
+                <p>Monitor</p>
+            </div>
+            <div class="peripheral" draggable="true" id="impressora" data-category="saida">
+                <img src="impressora.png" alt="Impressora">
+                <p>Impressora</p>
+            </div>
+            <div class="peripheral" draggable="true" id="microfone" data-category="entrada">
+                <img src="microfone.png" alt="Microfone">
+                <p>Microfone</p>
+            </div>
+        </div>
+        <div class="box" id="entrada" ondragover="allowDrop(event)" ondrop="drop(event, 'entrada')">
+            <h3>Entrada</h3>
+        </div>
+        <div class="box" id="saida" ondragover="allowDrop(event)" ondrop="drop(event, 'saida')">
+            <h3>Saída</h3>
+        </div>
+    </div>
+    <div id="descriptions"></div>
+    <button onclick="checkAnswers()">Verificar Respostas</button>
+    <script>
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        function drop(event, category) {
+            event.preventDefault();
+            let id = event.dataTransfer.getData("text");
+            let element = document.getElementById(id);
+            event.target.appendChild(element);
+            createDescriptionField(id);
+        }
+
+        // Modificando o dragstart para capturar o elemento inteiro
+        document.querySelectorAll(".peripheral").forEach(el => {
+            el.addEventListener("dragstart", (event) => {
+                event.dataTransfer.setData("text", event.target.id);
+                event.target.style.opacity = "0.5"; // Opcional: muda a opacidade durante o arrasto
+            });
+
+            el.addEventListener("dragend", (event) => {
+                event.target.style.opacity = "1"; // Retorna a opacidade original após o arrasto
+            });
+        });
+
+        function createDescriptionField(id) {
+            if (!document.getElementById("desc-" + id)) {
+                let descDiv = document.createElement("div");
+                descDiv.className = "description";
+                descDiv.innerHTML = `<p>${id}: <input type='text' id='desc-${id}' placeholder='Descreva o periférico'></p>`;
+                document.getElementById("descriptions").appendChild(descDiv);
+            }
+        }
+
+        function checkAnswers() {
+            let correct = 0;
+            document.querySelectorAll(".peripheral").forEach(el => {
+                let category = el.getAttribute("data-category");
+                let parent = el.parentElement.id;
+                if (category === parent) {
+                    correct++;
+                }
+            });
+            let total = document.querySelectorAll(".peripheral").length;
+            alert(`Você classificou corretamente ${correct} de ${total} periféricos!`);
+        }
+    </script>
+</body>
+</html>
